@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSimulation } from './hooks/useSimulation.js';
 import Header from './components/Header.jsx';
 import ControlPanel from './components/ControlPanel.jsx';
+import AdvancedPanel from './components/AdvancedPanel.jsx';
 import Statistics from './components/Statistics.jsx';
 import SimulationView from './components/SimulationView.jsx';
 import FloorPlan from './components/FloorPlan.jsx';
@@ -11,6 +12,7 @@ export default function App() {
     config,
     updateConfig,
     applyPreset,
+    applyAdvanced,
     running,
     toggleRunning,
     display,
@@ -18,6 +20,7 @@ export default function App() {
   } = useSimulation();
 
   const [activeView, setActiveView] = useState('lanes');
+  const [leftTab,    setLeftTab]    = useState('configure');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
@@ -28,18 +31,40 @@ export default function App() {
         onReset={() => reset()}
       />
 
-      <div className="app-main">
-        <ControlPanel
-          config={config}
-          updateConfig={updateConfig}
-          applyPreset={applyPreset}
-          onReset={reset}
-        />
+      <div className="app-body">
+
+        {/* ── Left sidebar with Configure / Advanced tabs ── */}
+        <div className="left-sidebar">
+          <div className="left-tabs">
+            <button
+              className={`left-tab-btn ${leftTab === 'configure' ? 'active' : ''}`}
+              onClick={() => setLeftTab('configure')}
+            >
+              Configure
+            </button>
+            <button
+              className={`left-tab-btn ${leftTab === 'advanced' ? 'active' : ''}`}
+              onClick={() => setLeftTab('advanced')}
+            >
+              Advanced
+            </button>
+          </div>
+
+          {leftTab === 'configure'
+            ? <ControlPanel
+                config={config}
+                updateConfig={updateConfig}
+                applyPreset={applyPreset}
+                onReset={reset}
+              />
+            : <AdvancedPanel onApply={applyAdvanced} />
+          }
+        </div>
 
         <div className="content-area">
           <Statistics display={display} />
 
-          {/* Tab switcher */}
+          {/* Right view tabs */}
           <div className="view-tabs">
             <button
               className={`view-tab ${activeView === 'lanes' ? 'active' : ''}`}
